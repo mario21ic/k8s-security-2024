@@ -112,9 +112,9 @@ kubectl port-forward mygraf-grafana-xxxx-xxx 3000 --address="0.0.0.0"
 Navegar http://localhost:3000/
 
 Prometheus + Grafana
-* En http://myprom-prometheus-server como DataSource http://localhost:3000/connections/datasources y dar en boton "Save & Test"
-* Importar http://localhost:3000/dashboard/import codigo 15282 y boton "Load"
-* Buscar dashboards https://grafana.com/grafana/dashboards/
+* En http://localhost:3000/connections/datasources crear Nuevo Datasource de tipo Prometheus con URL "http://myprom-prometheus-server" y dar en boton "Save & Test"
+* En http://localhost:3000/dashboard/import importar con codigo "15282" y boton "Load"
+* Opcional: buscar dashboards https://grafana.com/grafana/dashboards/
 
 ### 7. Loki
 ```
