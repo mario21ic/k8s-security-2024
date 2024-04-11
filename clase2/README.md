@@ -105,13 +105,15 @@ helm list
 Obtener clave y acceso:
 ```
 kubectl get secret mygraf-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-kubectl port-forward mygraf-grafana-b8449cdb6-tkh6j 3000 --address="0.0.0.0"
+
+kubectl get pods | grep mygraf
+kubectl port-forward mygraf-grafana-xxxx-xxx 3000 --address="0.0.0.0"
 ```
 Navegar http://localhost:3000/
 
 Prometheus + Grafana
-* En http://myprom-prometheus-server como DataSource http://localhost:3000/connections/datasources
-* Importar http://localhost:3000/dashboard/import codigo 15282 y boton Load
+* En http://myprom-prometheus-server como DataSource http://localhost:3000/connections/datasources y dar en boton "Save & Test"
+* Importar http://localhost:3000/dashboard/import codigo 15282 y boton "Load"
 * Buscar dashboards https://grafana.com/grafana/dashboards/
 
 ### 7. Loki
