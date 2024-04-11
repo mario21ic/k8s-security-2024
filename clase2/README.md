@@ -52,7 +52,6 @@ a) Kubeval
 wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
 tar xf kubeval-linux-amd64.tar.gz
 
-git clone 
 ./kubeval *.yaml
 ```
 
@@ -80,7 +79,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 helm search repo prometheus
 
-helm install myprom prometheus-community/prometheus -f prom-values.yaml
+helm install myprom prometheus-community/prometheus
 helm list
 ```
 
