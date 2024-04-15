@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minimal-ingress
+  annotations:
+    #nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  #ingressClassName: nginx-example
+  tls:
+    - hosts:
+      - hello-world.info
+      secretName: kubapp1-secret-tls
+  rules:
+  - host: hello-world.info
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web2-svc
+            port:
+              number: 8080
+      - path: /testpath
+        pathType: Prefix
+        backend:
+          service:
+            name: web1-svc
+            port:
+              number: 8080
