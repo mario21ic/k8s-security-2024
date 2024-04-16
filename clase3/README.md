@@ -1,3 +1,24 @@
+Conexión de K3s y kubectl:
+```
+sudo systemctl status k3s.service
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+kubectl get pods
+```
+
+Opcional: Instalar Kubecolor
+```
+https://github.com/hidetatz/kubecolor/releases/download/v0.0.25/kubecolor_0.0.25_Linux_x86_64.tar.gz
+tar -xvf kubecolor_0.0.25_Linux_x86_64.tar.gz
+sudo mv kubecolor /usr/local/bin/
+
+alias kubectl=kubecolor
+alias k=kubecolor
+
+k get pods
+```
+
 ### 1. SCA - Dependency check
 ```
 cd dependency_check
