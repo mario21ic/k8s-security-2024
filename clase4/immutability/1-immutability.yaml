@@ -1,0 +1,24 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: immutability-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx:alpine
+
+    securityContext:
+      readOnlyRootFilesystem: true # 1. para que no reescribe el codigo ni nada del FS en runtime
+
+    volumeMounts: # 1. para poder escribir de forma temporal en carpetas especificas
+    - name: cache
+      mountPath: /var/cache/nginx
+    - name: runtime
+      mountPath: /var/run
+
+  volumes: # emptyDirs
+  - name: cache
+    emptyDir: {}
+  - name: runtime
+    emptyDir: {}
+
