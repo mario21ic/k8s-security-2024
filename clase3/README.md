@@ -70,10 +70,11 @@ kubectl get secret mygraf-grafana -o jsonpath="{.data.admin-password}" | base64 
 kubectl get pods | grep mygraf
 kubectl port-forward mygraf-grafana-xxxx-xxx 3000 --address="0.0.0.0"
 ```
-Navegar en http://<ip-server>:3000
+Navegar en http://ip-server:3000
 
 Loki + Grafana:
-* En Grafana agregar datasource Loki http://localhost:3000/connections/datasources/new con URL http://myloki:3100
+* En Grafana agregar datasource Loki http://localhost:3000/connections/datasources/new con URL http://myloki:3100 y luego click en boton "Save & Test"
+Nota seguro sale un falso negativo de que no conecta.
 
 Volviendo a instalar Voting app:
 ```
