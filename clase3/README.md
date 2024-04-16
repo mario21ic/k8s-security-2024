@@ -63,8 +63,10 @@ helm install myloki grafana/loki-stack
 helm list
 ```
 
-Exponiendo Grafana:
+Obteniendo password y exponiendo Grafana:
 ```
+kubectl get secret mygraf-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
 kubectl get pods | grep mygraf
 kubectl port-forward mygraf-grafana-xxxx-xxx 3000 --address="0.0.0.0"
 ```
