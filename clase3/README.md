@@ -63,6 +63,13 @@ helm install myloki grafana/loki-stack
 helm list
 ```
 
+Exponiendo Grafana:
+```
+kubectl get pods | grep mygraf
+kubectl port-forward mygraf-grafana-xxxx-xxx 3000 --address="0.0.0.0"
+```
+Navegar en http://<ip-server>:3000
+
 Loki + Grafana:
 * En Grafana agregar datasource Loki http://localhost:3000/connections/datasources/new con URL http://myloki:3100
 * En Grafana http://localhost:3000/explore poner filtros:
