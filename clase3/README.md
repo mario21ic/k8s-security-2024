@@ -100,10 +100,16 @@ kubectl run nginx --image=nginxinc/nginx-unprivileged
 kubectl debug -ti nginx --image=ubuntu --target=nginx
 # ps aux
 # apt update && apt install -y tcpdump
-# tcpdump -i any -nn port 80
+# tcpdump -i any -nn port 8080
+```
 
-kubectl port-forward pod/nginx 8080:80
-curl localhost:8080
+En otra sesion de terminal:
+```
+kubectl port-forward pod/nginx 8080:8080 --address="0.0.0.0"
+```
+Navegar al ip-server:8080 o hacer:
+```
+curl ip-server:8080
 ```
 
 b) Copiar Proceso
