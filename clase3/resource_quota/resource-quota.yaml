@@ -10,4 +10,3 @@ spec:
    "requests.memory": 1024Mi
    "limits.cpu": "4"
    "limits.memory": 2048Mi
-

@@ -5,8 +5,8 @@ metadata:
 spec:
  containers:
  - name: sec-ctx-3
-   image: busybox:latest
+   image: ubuntu:22.04
    command: [ "sh", "-c", "sleep 1h" ]
    securityContext:
+     privileged: true
      allowPrivilegeEscalation: true
-

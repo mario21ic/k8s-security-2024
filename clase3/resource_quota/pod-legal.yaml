@@ -14,4 +14,3 @@ spec:
        limits:
          memory: 1024Mi  
          cpu: "2"
-

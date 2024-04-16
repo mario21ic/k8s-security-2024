@@ -79,12 +79,115 @@ kubectl debug node/vm-krowdyuser -ti --image=ubuntu:22.04
 ```
 
 ### 6. Security Context
+Pod con privileged y escalation:
 ```
+kubectl apply -f pod-privileged.yaml
+
+kubectl get pods
+kubectl exec -ti pod-privileged bash
+# id
+# apt update && apt install kmod gcc make git linux-headers-$(uname -r) -y
+
+# git clone https://github.com/mario21ic/linux-kernel-module-demo
+# cd linux-kernel-module-demo/
+# make all
+# insmod lkm_example.ko
+# dmesg | tail # Debe verse el mensaje de Hello
+
+# lsmod |grep lkm_example
+
+# cat /proc/1/status |grep Cap
+# exit
 ```
+Deben ser asi:
+CapPrm:	000001ffffffffff
+CapEff:	000001ffffffffff
+
+Revisar en host:
+```
+sudo lsmod | grep example
+```
+
+Pod con capabilities para network:
+```
+$ kubectl apply -f pod-capabilities.yaml
+$ kubectl get pods
+$ kubectl exec -ti pod-capabilities sh
+# id
+# ip link add dummy01 type dummy
+# ip link show
+# cat /proc/1/status |grep Cap
+# exit
+```
+Deben ser asi:
+CapPrm: 00000000aa0435fb
+CapEff: 00000000aa0435fb
+# exit
+
+
+Nota: si desean ver los valores y su combinacion https://github.com/torvalds/linux/blob/master/include/uapi/linux/capability.h 
+
+
 
 ### 7. Resource Quotas
 ```
+kubectl delete namespace my-namespace 
+kubectl create namespace my-namespace 
+kubectl config set-context --current --namespace=my-namespace
+
+kubectl apply -f resource-quota.yaml
+kubectl get resourcequota -n my-namespace
 ```
+Debe salir:
+my-resource-quota   13s   pods: 0/5, requests.cpu: 0/2, requests.memory: 0/1Gi   limits.cpu: 0/4, limits.memory: 0/2Gi
+
+Intentar desplegar un pod:
+```
+kubectl apply -f pod-illegal.yaml
+```
+Error from server (Forbidden): error when creating "pod-illegal.yaml": pods "pod-illegal" is forbidden: failed quota: my-resource-quota: must specify limits.cpu,limits.memory,requests.cpu,requests.memory
+
+
+Crear Pod que pida recursos minimos:
+```
+kubectl apply -f pod-legal.yaml
+kubectl get pods -n my-namespace
+kubectl get resourcequota -n my-namespace
+```
+my-resource-quota   4m43s   pods: 1/5, requests.cpu: 500m/2, requests.memory: 768Mi/1Gi   limits.cpu: 2/4, limits.memory: 1Gi/2Gi
+
+Probar otro pod:
+```
+$ kubectl apply -f pod-legal2.yaml
+```
+Debe salir error, porque 768+512 superan los 1024.
+
+
+Probar Deployment:
+```
+kubectl apply -f deploy.yaml
+kubectl get pods -n my-namespace
+kubectl get deploy -n my-namespace
+```
+
+Revisando el status de un Resource Quota:
+```
+$ kubectl describe resourcequota -n my-namespace
+```
+Name:            my-resource-quota
+Namespace:       my-namespace
+Resource         Used   Hard
+--------         ----   ----
+limits.cpu       2      4
+limits.memory    1Gi    2Gi
+pods             1      5
+requests.cpu     500m   2
+requests.memory  768Mi  1Gi
+
+
+Ejercicio:
+* Crear namespace "qaenv", desplegar ahi Voting app, limitar el numero de Pods a 7, limitar el numero de Services a 4, intentar escalar a 2 replicas votos y results.
+* Crear namespace "staging", desplegar ahi Voting app, limitar el numero de Pods a 14, limitar el numero de Services a 4, intentar escalar replicas votos=4 results=4 worker=4.
 
 ### 8. RBAC
 ```
