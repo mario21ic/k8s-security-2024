@@ -91,5 +91,27 @@ kubectl debug node/vm-krowdyuser -ti --image=ubuntu:22.04
 ```
 
 ### 9. Resource Ingress + TLS
+Generamos certificados:
 ```
+openssl req -newkey rsa:2048 -nodes -keyout tls1.key -x509 -days 365 -out tls1.crt -subj '/CN=kubapp1'
+openssl req -newkey rsa:2048 -nodes -keyout tls2.key -x509 -days 365 -out tls2.crt -subj '/CN=kubapp2'
+```
+
+Codificamos en base64:
+```
+cat tls1.key | base64
+cat tls1.crt | base64
+
+cat tls2.key | base64
+cat tls2.crt | base64
+```
+Con lo obtenido actualizamos el archivo secret-tls.yaml
+
+Instalamos:
+```
+kubectl apply -f web1.yaml
+kubectl apply -f web2.yaml
+
+kubectl apply -f secret-tls.yaml
+kubectl apply -f ingress.yaml
 ```
