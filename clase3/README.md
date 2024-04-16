@@ -25,6 +25,13 @@ cd dependency_check
 ./scan.sh
 ```
 
+Opcional: Usando cli:
+```
+wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.1.0/dependency-check-9.1.0-release.zip
+unzip dependency-check-9.1.0-release.zip
+./bin/dependency-check.sh --out ./reports --scan /ruta/a/escanear/
+```
+
 ### 2. SBOM - Syft
 ```
 curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sudo sh -s -- -b /usr/local/bin
