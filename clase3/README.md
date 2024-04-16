@@ -27,7 +27,7 @@ cd dependency_check
 
 ### 2. SBOM - Syft
 ```
-curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sudo sh -s -- -b /usr/local/bin
 
 syft -q mario21ic/nginx:alpine
 
