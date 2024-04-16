@@ -115,3 +115,8 @@ kubectl apply -f web2.yaml
 kubectl apply -f secret-tls.yaml
 kubectl apply -f ingress.yaml
 ```
+
+Probando:
+```
+curl -H "Host: hello-world.info" http://<ip-server>
+```
