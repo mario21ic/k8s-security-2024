@@ -74,6 +74,14 @@ Navegar en http://<ip-server>:3000
 
 Loki + Grafana:
 * En Grafana agregar datasource Loki http://localhost:3000/connections/datasources/new con URL http://myloki:3100
+
+Volviendo a instalar Voting app:
+```
+cd clase2/example-voting-app/k8s-specifications
+kubectl delete -f ./
+kubectl apply -f ./
+```
+
 * En Grafana http://localhost:3000/explore poner filtros:
 app = loki
 app = vote
