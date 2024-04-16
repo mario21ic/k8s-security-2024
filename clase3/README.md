@@ -35,6 +35,17 @@ syft -q alpine
 syft -q ubuntu:22.04
 ```
 
+Probar con htop y alpine:
+```
+cd clase1/dockerfiles
+docker build -t mario21ic/myhtop ./
+
+syft -q alpine > alpine.txt
+syft -q mario21ic/myhtop > myhtop.txt
+diff --color alpine.txt myhtop.txt
+```
+
+
 ### 3. Loki
 ```
 helm repo add grafana https://grafana.github.io/helm-charts
