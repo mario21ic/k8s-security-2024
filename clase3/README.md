@@ -190,8 +190,117 @@ Ejercicio:
 * Crear namespace "staging", desplegar ahi Voting app, limitar el numero de Pods a 14, limitar el numero de Services a 4, intentar escalar replicas votos=4 results=4 worker=4.
 
 ### 8. RBAC
+Service accounts:
 ```
+kubectl config set-context --current --namespace=my-namespace
+
+kubectl get serviceaccount
+kubectl get serviceaccount -A
+kubectl get serviceaccount --all-namespaces|grep default
 ```
+
+Desplegando pod con sa default:
+```
+kubectl apply -f pod-default.yaml
+kubectl get pods
+kubectl get svc
+
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   29m
+```
+Ese es el service del Kubernetes Api interno.
+
+Verificar su service account
+```
+$ kubectl describe pod pod-default|grep -i "account"
+/var/run/secrets/kubernetes.io/serviceaccount from default-token-tmqxh (ro)
+
+$ kubectl exec -ti pod-default sh
+# ls -la /var/run/secrets/kubernetes.io/serviceaccount/
+# cat /var/run/secrets/kubernetes.io/serviceaccount/namespace
+```
+
+Preguntando al Kubernetes service como usuario anonimo:
+```
+# apk add --update curl
+# curl https://kubernetes/api/v1 --insecure
+```
+Debe salir error por ser usuario anonimo.
+
+Obteniendo Token del Service Account default:
+```
+# TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+# curl -H "Authorization: Bearer $TOKEN" https://kubernetes/api/v1/ --insecure
+```
+Debe funcionar sin problemas y listar.
+
+Listar Pods:
+```
+# curl -H "Authorization: Bearer $TOKEN" https://kubernetes/api/v1/namespaces/default/pods/ --insecure
+# exit
+```
+Debe salir error porque el service account default no tiene permisos de listar Pods.
+
+#### Crear Service Account + Role + Role Binding
+Crear un SA:
+```
+$ kubectl apply -f service-account.yaml
+$ kubectl get sa
+```
+
+Crear Role
+```
+$ kubectl apply -f role.yaml
+$ kubectl get role
+```
+
+
+Crear Role binding para listar pods:
+```
+$ kubectl apply -f role-binding.yaml
+$ kubectl get rolebinding
+
+$ kubectl get role,sa,rolebinding
+```
+
+Crear Pod usando el SA anterior:
+```
+$ kubectl apply -f pod-sa.yaml
+$ kubectl get pods
+```
+
+Verificar que use el service account demo-sa
+```
+$ kubectl describe pods pod-demo-sa | grep -i "account"
+Service Account:  demo-sa
+
+$ kubectl exec -ti pod-demo-sa sh
+# ls -la /var/run/secrets/kubernetes.io/serviceaccount/
+# cat /var/run/secrets/kubernetes.io/serviceaccount/namespace
+```
+
+Preguntando al kubernetes service:
+```
+# apk add --update curl
+# curl https://kubernetes/api/v1 --insecure
+```
+Debe salir error por ser usuario anonimo.
+
+Obteniendo token del service account default:
+```
+# TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+# curl -H "Authorization: Bearer $TOKEN" https://kubernetes/api/v1/ --insecure
+# curl -H "Authorization: Bearer $TOKEN" https://kubernetes/api/v1/namespaces/default/pods/ --insecure
+```
+En ambos casos debe funcionar sin problemas y listar correctamente.
+
+Probando en listar services:
+```
+$ curl -H "Authorization: Bearer $TOKEN" https://kubernetes/api/v1/namespaces/default/services/ --insecure
+```
+Debe salir error porque el role es solo para listar pods mas no services.
+
+
 
 ### 9. Resource Ingress + TLS
 Generamos certificados:
