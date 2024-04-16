@@ -118,7 +118,7 @@ kubectl run nginx2 --image=nginxinc/nginx-unprivileged
 kubectl debug -ti nginx2 --image=ubuntu --share-processes --copy-to=nginx2-debug
 # ps fax
 $ kubectl get pods
-kubectl describe pod nginx2
+kubectl describe pod nginx2-debug
 ```
 Pod nginx2 debe tener 2 containers, el nginx copiado y el debug
 
