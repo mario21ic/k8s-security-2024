@@ -8,6 +8,7 @@ spec:
       app: redis
   policyTypes:
     - Ingress
+    - Egress # al no definirse se deja sin salida
   ingress:
     - from:
       - podSelector:
