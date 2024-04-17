@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-result-app
+spec:
+  podSelector:
+    matchLabels:
+      app: result
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from: []
+      ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    - to:
+      - podSelector:
+          matchLabels:
+            app: db
+      ports:
+        - protocol: TCP
+          #port: 5431 # error
+          port: 5432
+    - to:
+      - namespaceSelector: {}  # Permitir DNS, necesario para la resolución de nombres
+      ports:
+        - protocol: UDP
+          port: 53
+
