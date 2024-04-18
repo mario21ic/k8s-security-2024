@@ -1,0 +1,9 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""] # "" => pods, servicios y nodos. apps => deployments y replicasets. batch => jobs y cronjobs . rbac.authorization.k8s.io => roles y rolebindings
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "create"]

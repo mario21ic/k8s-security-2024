@@ -1,6 +1,6 @@
 Conexión de K3s y kubectl:
 ```
-sudo systemctl status k3s.service
+sudo systemctl start k3s.service
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 

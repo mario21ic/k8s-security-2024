@@ -1,6 +1,29 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: web1-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  tls:
+    - hosts:
+      - hello-world-v1.info
+      secretName: kubapp1-secret-tls
+  rules:
+  - host: hello-world-v1.info
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web1-svc
+            port:
+              number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   name: web2-ingress
   annotations:
     #nginx.ingress.kubernetes.io/rewrite-target: /
@@ -23,29 +46,6 @@ spec:
             port:
               number: 8080
       - path: /v1
-        pathType: Prefix
-        backend:
-          service:
-            name: web1-svc
-            port:
-              number: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: web1-ingress
-  annotations:
-    kubernetes.io/ingress.class: "traefik"
-spec:
-  tls:
-    - hosts:
-      - hello-world-v1.info
-      secretName: kubapp1-secret-tls
-  rules:
-  - host: hello-world-v1.info
-    http:
-      paths:
-      - path: /
         pathType: Prefix
         backend:
           service:
