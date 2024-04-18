@@ -128,9 +128,14 @@ Ejercicio:
 * Crear namespace "staging", desplegar ahi Voting app, limitar el numero de Pods a 14, limitar el numero de Services a 4, intentar escalar replicas votos=4 results=4 worker=4.
 
 ### 3. RBAC
+Regresar context al default:
+```
+kubectl config set-context --current --namespace=default
+```
+
 Service accounts:
 ```
-kubectl config set-context --current --namespace=my-namespace
+
 
 kubectl get serviceaccount
 kubectl get serviceaccount -A
