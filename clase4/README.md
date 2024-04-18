@@ -60,6 +60,14 @@ Nota: si desean ver los valores y su combinacion https://github.com/torvalds/lin
 
 
 ### 2. Resource Quotas
+Copiar archivo kubeconfig de k3s a ruta del usuario:
+```
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo chown $USER:$USER ~/.kube/config
+export KUBECONFIG=~/.kube/config
+```
+
+Crear namespace y Resource Quota:
 ```
 kubectl delete namespace my-namespace 
 kubectl create namespace my-namespace 
