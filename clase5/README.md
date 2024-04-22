@@ -1,3 +1,7 @@
+# Clase 5
+
+## 0. Pre-requisito
+
 Poner stop K3S, instalar Docker y Minikube
 ```
 sudo systemctl stop k3s
@@ -16,9 +20,8 @@ export KUBECONFIG=$HOME/.kube/config
 kubectl get nodes
 ```
 
-### 1. RBAC - User Accounts
 
-
+## 1. RBAC - User Accounts
 
 Creando certificados para user1
 ```
@@ -83,10 +86,104 @@ Error from server (Forbidden): deployments.apps is forbidden: User "user1" canno
 
 Solucion: ua-role2.yaml ua-rolebinding2.yaml
 
+## 2. Secrets with Kubeseal
 
-### 2. Resource Ingress + TLS
+### a) Instalación:
+Controller:
+```
+kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.26.2/controller.yaml
+kubectl get pods -n kube-system
+```
 
-Paramos minikube y reiniciar k3s:
+Client:
+```
+KUBESEAL_VERSION='0.26.2'
+wget "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION:?}/kubeseal-${KUBESEAL_VERSION:?}-linux-amd64.tar.gz"
+tar -xvzf kubeseal-${KUBESEAL_VERSION:?}-linux-amd64.tar.gz kubeseal
+sudo install -m 755 kubeseal /usr/local/bin/kubeseal
+
+kubeseal --version
+```
+
+### b) Crear Secret y SealedSecret
+```
+echo -n HelloWorld | kubectl create secret generic mysecret --dry-run=client --from-file=foo=/dev/stdin -o json > mysecret.json
+cat mysecret.json
+
+kubeseal < mysecret.json > mysealedsecret.json
+cat mysealedsecret.json
+
+kubectl apply -f mysealedsecret.json
+
+kubectl get sealedsecret
+kubectl describe sealedsecret mysecret
+
+kubectl get secret
+kubectl get secret mysecret -o yaml
+```
+
+### c) Backup y Restore del Master Key:
+```
+kubectl get secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > master_key.yaml
+
+kubectl apply -f master_key.yaml
+# eliminar pod, para reiniciar y agarre el nuevo key
+kubectl delete pod -n kube-system -l name=sealed-secrets-controller
+```
+
+## 3. Vault integration
+
+### a) Instalación de Vault en K8s:
+```
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo update
+
+helm install vault hashicorp/vault --set "server.dev.enabled=true"
+helm list
+kubectl get pods
+
+# Opcional
+kubectl port-forward vault-0 8200
+```
+
+### b) Crear un Vault secret:
+```
+kubectl exec -it vault-0 -- /bin/sh
+$ vault secrets enable -path=internal kv-v2
+
+$ vault kv put internal/database/config username="db-readonly-username" password="db-secret-password"
+$ vault kv get internal/database/config
+exit
+```
+
+### c) Crear Vault Auth para Kubernetes
+```
+kubectl exec -it vault-0 -- /bin/sh
+vault auth enable kubernetes
+
+vault write auth/kubernetes/config kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443"
+
+# Crear politica solo de lectura
+$ vault policy write internal-app - <<EOF
+path "internal/data/database/config" {
+   capabilities = ["read"]
+}
+EOF
+
+# Solo para Namespace default
+$ vault write auth/kubernetes/role/internal-app \
+      bound_service_account_names=internal-app \
+      bound_service_account_namespaces=default \
+      policies=internal-app \
+      ttl=24h
+
+$ exit
+```
+TODO launch app, try different namespace, etc
+
+### 4. Ingress + TLS
+
+Paramos Minikube y reiniciar K3S:
 ```
 minikube stop
 
@@ -128,4 +225,6 @@ curl --insecure -H "Host: hello-world-v1.info" https://ip-server
 ```
 Abrir las mismas URLs en un browser.
 
-
+### 4. Network Policies - Ingress / Egress
+```
+```
