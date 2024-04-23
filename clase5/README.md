@@ -226,5 +226,122 @@ curl --insecure -H "Host: hello-world-v1.info" https://ip-server
 Abrir las mismas URLs en un browser.
 
 ### 4. Network Policies - Ingress / Egress
+
+#### a) Instalando curl y probando accesos desde Redis:
 ```
+kubectl get pods --show-labels
+
+kubectl exec -ti $(kubectl get pod -l app=redis -o jsonpath="{.items[0].metadata.name}") -- sh
+# apk add curl busybox-extras
+# curl vote:5000
+# curl result:5001
+# telnet db 5432
+Ctrl + C
+e
+```
+
+#### b) Protegiendo Redis y probando desde Redis, DB, Vote, Worker y Result:
+```
+kubectl -f apply np-redis.yaml
+kubectl get networkpolicies
+
+kubectl exec -ti $(kubectl get pod -l app=redis -o jsonpath="{.items[0].metadata.name}") -- sh
+# apk add git
+# curl vote:5000
+# curl result:5001
+# telnet db 5432
+# exit
+
+kubectl exec -ti $(kubectl get pod -l app=db -o jsonpath="{.items[0].metadata.name}") -- bash
+# apk add curl busybox-extras
+# telnet redis 6379
+# exit
+
+kubectl exec -ti $(kubectl get pod -l app=vote -o jsonpath="{.items[0].metadata.name}") -- bash
+# apt update && apt install curl dnsutils telnet -y
+# telnet redis 6379
+quit
+# exit
+
+kubectl exec -ti $(kubectl get pod -l app=worker -o jsonpath="{.items[0].metadata.name}") -- bash
+# apt update && apt install curl dnsutils telnet -y
+# telnet redis 6379
+quit
+# exit
+
+kubectl exec -ti $(kubectl get pod -l app=result -o jsonpath="{.items[0].metadata.name}") -- bash
+# apt update && apt install curl dnsutils telnet -y
+# telnet redis 6379
+# exit
+```
+
+#### c) Aplicar a todos los componentes y probar:
+```
+kubectl apply -f np-db.yaml
+kubectl apply -f np-vote-deny.yaml
+kubectl apply -f np-worker-deny.yaml
+kubectl apply -f np-result-deny.yaml
+kubectl get networkpolicies
+
+kubectl exec -ti $(kubectl get pod -l app=db -o jsonpath="{.items[0].metadata.name}") -- bash
+# apk add git
+# curl vote:5000
+# curl result:5001
+# exit
+
+kubectl exec -ti $(kubectl get pod -l app=vote -o jsonpath="{.items[0].metadata.name}") -- bash
+# apt install git -y
+# telnet db 5432
+# telnet redis 6379
+quit
+# exit
+
+kubectl exec -ti $(kubectl get pod -l app=worker -o jsonpath="{.items[0].metadata.name}") -- bash
+# apt install git -y
+# telnet db 5432
+quit
+# telnet redis 6379
+quit
+# exit
+
+kubectl exec -ti $(kubectl get pod -l app=result -o jsonpath="{.items[0].metadata.name}") -- bash
+# apt install git -y
+# telnet redis 6379
+# telnet db 5432
+quit
+# exit
+```
+
+### 5. Audit Logs
+
+#### a) Configurar K3s agent
+```
+cp policy.yaml /var/lib/rancher/k3s/server/manifests/policy.yaml
+sudo cp /etc/systemd/system/k3s.service /etc/systemd/system/k3s.service.bkp
+
+sudo nano /etc/systemd/system/k3s.service
+ExecStart=/usr/local/bin/k3s \
+    server \
+    '--kube-apiserver-arg=tls-min-version=VersionTLS12' \
+    '--kube-apiserver-arg=audit-policy-file=/var/lib/rancher/k3s/server/manifests/policy.yaml' \
+    '--kube-apiserver-arg=audit-log-path=/var/log/kubernetes/audit/audit.log' \
+    '--kube-apiserver-arg=audit-log-maxsize=3' \
+    '--kube-apiserver-arg=audit-log-maxbackup=10' \
+    '--kube-apiserver-arg=audit-log-maxage=7' \
+	'--kubelet-arg' \
+	'container-log-max-files=3' \
+	'--kubelet-arg' \
+	'container-log-max-size=10Mi' \
+
+sudo systemctl daemon-reload
+sudo systemctl restart k3s
+```
+
+#### b) Probando
+```
+tail -f /var/log/kubernetes/audit/audit.log
+
+kubectl apply -f pod.yaml
+kubectl apply -f configmap.yaml
+kubectl apply -f deploy.yaml
 ```

@@ -13,10 +13,10 @@ apiVersion: audit.k8s.io/v1
 kind: Policy
 rules:
   # Log changes to Namespaces at the RequestResponse level
-  - level: RequestResponse
-    resources:
-    - group: ""
-      resources: ["namespaces"]
+  # - level: RequestResponse
+  #   resources:
+  #   - group: ""
+  #     resources: ["namespaces"]
   # Log pod changes in the audit-test Namespace at Request level
   - level: Request
     resources:
@@ -39,5 +39,4 @@ rules:
       resources: ["deployments"]
 
   # Catch-all - Log all request at the metadata levels
-  - level: Metadata
-
+  # - level: Metadata

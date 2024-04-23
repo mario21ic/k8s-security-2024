@@ -56,5 +56,11 @@ kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Notice
 
 ## 6. CIS K8s Benchmark
 ```
+git clone https://github.com/aquasecurity/kube-bench
+cd kube-bench
+kubectl apply -f job.yaml
+
+kubectl get pods
+kubectl logs -l app=kube-bench
 ```
 
