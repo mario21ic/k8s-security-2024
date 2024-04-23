@@ -20,6 +20,16 @@ export KUBECONFIG=$HOME/.kube/config
 kubectl get nodes
 ```
 
+Instalar Stern:
+```
+wget https://github.com/stern/stern/releases/download/v1.28.0/stern_1.28.0_linux_amd64.tar.gz
+tar -xvf stern_1.28.0_linux_amd64.tar.gz
+sudo mv stern /usr/local/bin
+
+stern -n kube-system kube-proxy
+```
+Ctrl+c
+
 
 ## 1. RBAC - User Accounts
 
