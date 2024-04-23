@@ -199,6 +199,7 @@ kubectl get serviceaccounts
 ### c) Verificar Vault Secrets
 ```
 kubectl apply -f deployment-orgchart.yaml
+kubectl logs -l app=orgchart
 
 kubectl exec \
       $(kubectl get pod -l app=orgchart -o jsonpath="{.items[0].metadata.name}") \
