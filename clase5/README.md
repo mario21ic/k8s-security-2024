@@ -201,6 +201,9 @@ kubectl get serviceaccounts
 kubectl apply -f deployment-orgchart.yaml
 kubectl logs -l app=orgchart
 
+# Opcional
+stern orgchart
+
 kubectl exec \
       $(kubectl get pod -l app=orgchart -o jsonpath="{.items[0].metadata.name}") \
       --container orgchart -- ls /vault/secrets
