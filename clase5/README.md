@@ -268,10 +268,10 @@ kubectl apply -f ingress.yaml
 
 Probando:
 ```
-curl --insecure -H "Host: hello-world-v2.info" https://ip-server
-curl --insecure -H "Host: hello-world-v2.info" https://ip-server/v1
+curl --insecure -H "Host: hello-world-v2.info" https://localhost
+curl --insecure -H "Host: hello-world-v2.info" https://localhost/v1
 
-curl --insecure -H "Host: hello-world-v1.info" https://ip-server
+curl --insecure -H "Host: hello-world-v1.info" https://localhost
 ```
 Abrir las mismas URLs en un browser.
 
