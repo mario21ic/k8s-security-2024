@@ -85,10 +85,12 @@ $ kubectl get role,rolebinding
 Probando permisos:
 ```
 $ kubectl config use-context user1-context
+$ kubectl apply -f pod.yaml
+
 $ kubectl get pods
 $ kubectl get pods -w
-Ahora si debe permitir listar los pods
 ```
+Ahora si debe permitir listar los pods
 
 Reto:
 El user1 debe poder listar deployments y services. Ademas de eliminar pods.
