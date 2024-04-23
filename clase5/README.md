@@ -90,6 +90,7 @@ Error from server (Forbidden): deployments.apps is forbidden: User "user1" canno
 
 Solucion: ua-role2.yaml ua-rolebinding2.yaml
 
+
 ## 2. Secrets with Kubeseal
 
 ### a) Instalación:
@@ -213,7 +214,8 @@ Ejercicio:
 * Usar template para secrets
 Mas info https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-sidecar
 
-### 4. Ingress + TLS
+
+## 4. Ingress + TLS
 
 Paramos Minikube y reiniciar K3S:
 ```
@@ -257,7 +259,8 @@ curl --insecure -H "Host: hello-world-v1.info" https://ip-server
 ```
 Abrir las mismas URLs en un browser.
 
-### 4. Network Policies - Ingress / Egress
+
+## 5. Network Policies - Ingress / Egress
 
 #### a) Instalando curl y probando accesos desde Redis:
 ```
@@ -344,7 +347,7 @@ quit
 # exit
 ```
 
-### 5. Audit Logs
+## 6. Audit Logs
 
 #### a) Configurar K3s agent
 ```
