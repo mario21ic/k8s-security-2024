@@ -390,7 +390,7 @@ sudo systemctl restart k3s
 
 #### b) Probando
 ```
-tail -f /var/log/kubernetes/audit/audit.log
+sudo tail -f /var/log/kubernetes/audit/audit.log
 
 kubectl apply -f pod.yaml
 kubectl apply -f configmap.yaml
