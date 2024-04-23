@@ -36,8 +36,12 @@ $ ls -la user1.*
 
 Crear user1:
 ```
+$ kubectl config get-users
+
 $ kubectl config set-credentials user1 --client-certificate=user1.crt --client-key=user1.key
 $ kubectl config set-context user1-context --cluster=minikube --user=user1
+
+$ kubectl config get-users
 ```
 
 Revisar la config:
@@ -141,10 +145,16 @@ helm repo update
 helm install vault hashicorp/vault --set "server.dev.enabled=true"
 helm list
 kubectl get pods
+```
 
-# Opcional
+# Opcional: Vault dashboard
+Para obtener clave y lanzar web ui:
+```
+kubectl logs vault-0
 kubectl port-forward vault-0 8200
 ```
+Abrir en navegador: http://localhost:8200/ui/
+
 
 ### b) Crear un Vault secret:
 ```
@@ -176,10 +186,32 @@ $ vault write auth/kubernetes/role/internal-app \
       bound_service_account_namespaces=default \
       policies=internal-app \
       ttl=24h
-
 $ exit
 ```
-TODO launch app, try different namespace, etc
+
+Crear K8s Service Account
+```
+kubectl apply -f service-account.yaml
+kubectl get serviceaccounts
+```
+
+### c) Verificar Vault Secrets
+```
+kubectl apply -f deployment-orgchart.yaml
+
+kubectl exec \
+      $(kubectl get pod -l app=orgchart -o jsonpath="{.items[0].metadata.name}") \
+      --container orgchart -- ls /vault/secrets
+kubectl exec \
+      $(kubectl get pod -l app=orgchart -o jsonpath="{.items[0].metadata.name}") \
+      --container orgchart -- cat /vault/secrets/database-config.txt
+```
+
+Ejercicio:
+* Lanzar deployment en otro namespace y validar si funciona.
+* Fixear el issue anterior
+* Usar template para secrets
+Mas info https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-sidecar
 
 ### 4. Ingress + TLS
 

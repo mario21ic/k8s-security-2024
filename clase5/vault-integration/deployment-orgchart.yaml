@@ -4,6 +4,7 @@ metadata:
   name: orgchart
   labels:
     app: orgchart
+  namespace: default # Match con auth/kubernetes/role/internal-app
 spec:
   selector:
     matchLabels:
@@ -11,11 +12,20 @@ spec:
   replicas: 1
   template:
     metadata:
-      annotations:
+      annotations: # Inyeccion de Secrets
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "internal-app"
+        # vault path
+        vault.hashicorp.com/agent-inject-secret-database-config.txt: "internal/data/database/config"
+        # Comentar para ver valores sin template
+        vault.hashicorp.com/agent-inject-template-database-config.txt: |
+            {{- with secret "internal/data/database/config" -}}
+            postgresql://{{ .Data.data.username }}:{{ .Data.data.password }}@postgres:5432/wizard
+            {{- end -}}
       labels:
         app: orgchart
     spec:
-      serviceAccountName: internal-app
+      serviceAccountName: internal-app  # Match con auth/kubernetes/role/internal-app
       containers:
         - name: orgchart
           image: jweissig/app:0.0.1
