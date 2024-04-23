@@ -119,8 +119,6 @@ kubectl get nodes
 ### a) Instalación:
 Controller:
 ```
-kubectl config use-context minikube
-
 kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.26.2/controller.yaml
 kubectl get pods -n kube-system
 ```
@@ -245,17 +243,6 @@ Mas info https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-s
 
 
 ## 4. Ingress + TLS
-
-Paramos Minikube y reiniciar K3S:
-```
-minikube stop
-
-sudo systemctl start k3s
-sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-
-kubectl get pods
-```
 
 Opcional: generamos certificados y codificamos en base64:
 ```
