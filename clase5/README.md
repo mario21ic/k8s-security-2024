@@ -367,7 +367,7 @@ quit
 
 #### a) Configurar K3s agent
 ```
-cp policy.yaml /var/lib/rancher/k3s/server/manifests/policy.yaml
+sudo cp policy.yaml /var/lib/rancher/k3s/server/manifests/policy.yaml
 sudo cp /etc/systemd/system/k3s.service /etc/systemd/system/k3s.service.bkp
 
 sudo nano /etc/systemd/system/k3s.service
