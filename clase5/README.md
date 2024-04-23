@@ -105,9 +105,22 @@ Solucion: ua-role2.yaml ua-rolebinding2.yaml
 
 ## 2. Secrets with Kubeseal
 
+Poner minikube stop y start K3S
+```
+minikube stop
+sudo systemctl start k3s
+
+sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
+export KUBECONFIG=$HOME/.kube/config
+sudo chown $USER:$USER $KUBECONFIG
+kubectl get nodes
+```
+
 ### a) Instalación:
 Controller:
 ```
+kubectl config use-context minikube
+
 kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.26.2/controller.yaml
 kubectl get pods -n kube-system
 ```
