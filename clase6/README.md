@@ -112,6 +112,7 @@ $ exit
 
 
 kubectl apply -f 3-immutability.yaml
+kubectl exec -ti immutability-pod3 -- sh
 $ id
 $ ifconfig
 $ mkdir /demo
