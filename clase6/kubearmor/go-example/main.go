@@ -21,7 +21,8 @@ func main() {
     fmt.Print(string(dat))
 
     fmt.Println("Iniciando nginx")
-    cmd := exec.Command("/usr/sbin/nginx", "-g", "daemon off;")
+    //cmd := exec.Command("/usr/sbin/nginx", "-g", "daemon off;")
+    cmd := exec.Command("/usr/sbin/nginx")
     if err := cmd.Start(); err != nil {
         fmt.Println("Error al iniciar:", err)
         return

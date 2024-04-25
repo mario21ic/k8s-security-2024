@@ -16,4 +16,4 @@ spec:
       - name: nginx
         #image: nginx
         #image: nginx:alpine
-        image: mario21ic/nginx:fake-v1.5
+        image: mario21ic/nginx:fake-v1.6

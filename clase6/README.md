@@ -45,7 +45,7 @@ minikube addons enable gvisor
 
 kubectl get runtimeclass,pod gvisor -n kube-system
 
-kuebctl apply -f  pod.yaml
+kubectl apply -f  pod.yaml
 kubectl exec -ti nginx-untrusted sh
 # dmesg
 ```
@@ -59,7 +59,7 @@ Mas info https://github.com/kubernetes/minikube/blob/master/deploy/addons/gvisor
 
 ## 3. KubeArmor
 
-### a) Instalacion
+### a) Instalacion y CLI
 ```
 helm repo add kubearmor https://kubearmor.github.io/charts
 helm repo update kubearmor
@@ -69,19 +69,88 @@ kubectl apply -f https://raw.githubusercontent.com/kubearmor/KubeArmor/main/pkg/
 
 # Install CLI
 curl -sfL http://get.kubearmor.io/ | sudo sh -s -- -b /usr/local/bin
-
 karmor --version
 ```
 
-### b) Probando
+### b) Desplegar apps y probar:
+```
+kubectl apply -f deploy-java.yaml
+kubectl apply -f deploy-nginx.yaml
+
+kubectl get deploy,pods
+
+kubectl logs -l app=java
+kubectl exec -ti $(kubectl get pod -l app=java -o jsonpath="{.items[0].metadata.name}") bash
+$ ps fax
+$ curl localhost:8080
+$ cat /vault/secrets/database.txt
+$ exit
+
+kubectl logs -l app=nginx
+kubectl exec -ti $(kubectl get pod -l app=nginx -o jsonpath="{.items[0].metadata.name}") bash
+# ps fax
+# curl localhost
+# cat /vault/secrets/database.txt
+# exit
+```
+
+### c) Bloquear por default namespace "default" y aplicar Policies
 ```
 kubectl annotate ns default kubearmor-file-posture=block --overwrite
 
-kubectl apply -f demo5.yaml
+kubectl apply -f allow-java.yaml
+kubectl apply -f allow-nginx.yaml
 kubectl get kubearmorpolicy
+```
 
-kubectl apply -f job.yaml
-kubectl logs -l job-name=nginx
+### d) Eliminar Java pods y probar
+```
+stern java-dp # opcional
+kubectl delete pod $(kubectl get pod -l app=java -o jsonpath="{.items[0].metadata.name}")
+kubectl logs -l app=java
+
+kubectl exec -ti $(kubectl get pod -l app=java -o jsonpath="{.items[0].metadata.name}") bash
+$ ps fax
+$ curl localhost:8080
+$ cat /vault/secrets/database.txt
+$ exit
+```
+
+### e) Eliminar Nginx pods y probar
+```
+stern nginx-dp # opcional
+kubectl delete pod $(kubectl get pod -l app=nginx -o jsonpath="{.items[0].metadata.name}")
+kubectl logs -l app=nginx
+
+kubectl exec -ti $(kubectl get pod -l app=nginx -o jsonpath="{.items[0].metadata.name}") bash
+$ ps fax
+$ curl localhost
+$ cat /vault/secrets/database.txt
+$ exit
+```
+
+Opcional: Abriendo port
+```
+kubectl port-forward $(kubectl get pod -l app=java -o jsonpath="{.items[0].metadata.name}") 8080:8080
+```
+Navegador http://localhost:8080
+
+### f) Copiando mediante kubectl cp
+```
+kubectl cp $(kubectl get pod -l app=java -o jsonpath="{.items[0].metadata.name}"):/vault/secrets/database.txt copiado.txt
+cat copiado.txt
+```
+Nota: en esta parte se debe pensar en User Accounts con permisos y Audit Logs.
+
+
+### g) Probando Modo Audit y default
+```
+kubectl annotate ns default kubearmor-file-posture=audit --overwrite
+karmor logs -n default
+kubectl exec -ti $(kubectl get pod -l app=nginx -o jsonpath="{.items[0].metadata.name}") cat /vault/secrets/database.txt
+
+# Permitir todo por default
+kubectl annotate ns default kubearmor-file-posture=allow --overwrite
 ```
 
 ## 4. Mutual TLS
@@ -126,7 +195,7 @@ helm install falco -n falco --set driver.kind=ebpf --set tty=true falcosecurity/
     --set falcosidekick.enabled=true \
     --set falcosidekick.config.slack.webhookurl=$(base64 --decode <<< "aHR0cHM6Ly9ob29rcy5zbGFjay5jb20vc2VydmljZXMvVDA0QUhTRktMTTgvQjA1SzA3NkgyNlMvV2ZHRGQ5MFFDcENwNnFzNmFKNkV0dEg4") \
     --set falcosidekick.config.slack.minimumpriority=notice \
-    --set falcosidekick.config.customfields="user:changeme"
+    --set falcosidekick.config.customfields="user:sup3rUs3r"
 
 
 kubectl get all -n falco -o wide
@@ -139,8 +208,11 @@ kubectl logs -f -l app.kubernetes.io/name=falco -n falco -c falco
 ```
 kubectl run alpine --image alpine -- sh -c "sleep infinity"
 kubectl exec -it alpine -- sh -c "uptime"
+
 kubectl exec -it alpine -- sh
-# apk add vim
+# apk add tcpdump nmap vim
+# tcpdump
+# nmap localhost
 # vim /etc/passwd
 
 kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Notice
