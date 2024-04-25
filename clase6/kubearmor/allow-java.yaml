@@ -1,0 +1,21 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: only-allow-java-exec
+spec:
+  selector:
+    matchLabels:
+      app: java
+  file:
+    #matchPaths:
+    #- path: /vault/secrets/database.txt
+    matchDirectories:
+    - dir: /
+      recursive: true
+    #- dir: /vault/secrets/
+    #  recursive: true
+  process:
+    matchPaths:
+    - path: /opt/java/openjdk/bin/java
+  action:
+    Allow

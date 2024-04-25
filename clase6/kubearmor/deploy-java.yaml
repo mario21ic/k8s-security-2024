@@ -1,0 +1,17 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: java-dp
+spec:
+  selector:
+    matchLabels:
+      app: java
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: java
+    spec:
+      containers:
+      - name: java
+        image: mario21ic/java-app:v3

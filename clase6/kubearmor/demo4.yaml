@@ -1,0 +1,15 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: audit-etc-nginx-access
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  file:
+    matchDirectories:
+    #- dir: /etc/nginx/
+    - dir: /app/config/
+      recursive: true  
+  action:
+    Audit

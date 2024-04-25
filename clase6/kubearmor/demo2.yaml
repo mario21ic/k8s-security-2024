@@ -1,0 +1,17 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: readonly-app-config
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  file:
+    matchDirectories:
+      - dir: /app/config
+    readOnlyProcesses:
+      - path: /bin/cat
+    #processDeniedPaths:
+    #  - path: /usr/bin/otherapp
+  action: Block

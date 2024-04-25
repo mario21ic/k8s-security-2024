@@ -1,0 +1,32 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: only-allow-nginx-exec
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  file:
+    matchPaths:
+    - path: /docker-entrypoint.sh
+    matchDirectories:
+    #- dir: /
+    - dir: /docker-entrypoint.d/
+      recursive: true
+    - dir: /etc/nginx/
+      recursive: true
+    - dir: /usr/share/nginx/html/
+      recursive: true
+    - dir: /var/run/
+      recursive: true
+    - dir: /vault/secrets/
+      recursive: true
+  process:
+    matchPaths:
+    - path: /main
+    #- path: /nginx
+    - path: /usr/sbin/nginx
+    #- path: /bin/bash
+    #- path: /usr/bin/ps
+  action:
+    Allow
