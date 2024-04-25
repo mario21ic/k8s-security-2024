@@ -2,6 +2,29 @@
 
 ## 0. Pre-requisito
 ```
+# K3s
+curl -sfL https://get.k3s.io | sh -
+sudo k3s kubectl get node
+sudo systemctl stop k3s
+
+# Kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+kubectl version --client
+
+
+# Minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+minikube start
+minikube status
+kubectl get nodes
+
+# Docker
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+sudo su - $USER
+docker info
 ```
 
 ## 1. Secured Runtime Sandbox with gVisor
