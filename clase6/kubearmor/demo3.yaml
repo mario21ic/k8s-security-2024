@@ -8,8 +8,7 @@ spec:
       app: nginx
   file:
     matchDirectories:
-    - dir: /app/config/
-    #- dir: /run/secrets/kubernetes.io/serviceaccount/
+    - dir: /run/secrets/kubernetes.io/serviceaccount/
       recursive: true
   action:
     Block

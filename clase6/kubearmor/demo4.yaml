@@ -8,8 +8,7 @@ spec:
       app: nginx
   file:
     matchDirectories:
-    #- dir: /etc/nginx/
-    - dir: /app/config/
+    - dir: /etc/nginx/
       recursive: true  
   action:
     Audit
