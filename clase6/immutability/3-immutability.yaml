@@ -1,7 +1,7 @@
 kind: Pod
 apiVersion: v1
 metadata:
-  name: immutability-pod
+  name: immutability-pod3
 spec:
   hostNetwork: false  # 3. host namespaces puede hacer mutable, ademas de no usar su propia red
 

@@ -45,6 +45,7 @@ minikube addons enable gvisor
 
 kubectl get runtimeclass,pod gvisor -n kube-system
 
+cd gvisor/
 kubectl apply -f  pod.yaml
 kubectl exec -ti nginx-untrusted sh
 # dmesg
@@ -54,7 +55,25 @@ Mas info https://github.com/kubernetes/minikube/blob/master/deploy/addons/gvisor
 
 ## 2. Immutability of Containers at Runtime
 ```
+cd immutability/
 
+kubectl apply -f 1-immutability.yaml
+kubectl exec -ti immutability-pod1 -- sh
+# mkdir /demo
+# mkdir /var/cache/nginx/demo
+# mkdir /var/run/demo
+# exit
+
+
+kubectl apply -f 2-immutability.yaml
+kubectl exec -ti immutability-pod2 -- sh
+$ id
+$ mkdir /demo
+$ mkdir /var/cache/nginx/demo
+$ ls -la /var/cache/nginx/
+$ exit
+
+kubectl apply -f 3-immutability.yaml
 ```
 
 ## 3. KubeArmor
@@ -74,6 +93,8 @@ karmor --version
 
 ### b) Desplegar apps y probar:
 ```
+cd kubearmor/
+
 kubectl apply -f deploy-java.yaml
 kubectl apply -f deploy-nginx.yaml
 
