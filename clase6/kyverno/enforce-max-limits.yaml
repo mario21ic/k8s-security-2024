@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: limit-resources
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: validate-resources
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "Los recursos solicitados superan los máximos permitidos."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  requests:
+                    memory: "<=1Gi"
+                    cpu: "<=500m"
+                  limits:
+                    memory: "<=2Gi"
+                    cpu: "<=1000m"
+

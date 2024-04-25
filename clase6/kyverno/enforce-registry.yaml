@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-image-registry
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: check-image-registry
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "Las imágenes deben provenir del repositorio permitido: mario21ic/"
+        pattern:
+          spec:
+            containers:
+              - (image): "mario21ic/*"
+

@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: enforce-namespace
+spec:
+  validationFailureAction: enforce
+  rules:
+    - name: validate-namespace
+      match:
+        resources:
+          kinds:
+            - Deployment
+            - Service
+      validate:
+        message: "Este recurso solo puede crearse en el espacio de nombres 'production' o 'development'."
+        pattern:
+          metadata:
+            namespace: "^(production|development)$"
+

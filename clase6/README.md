@@ -54,6 +54,20 @@ Mas info https://github.com/kubernetes/minikube/blob/master/deploy/addons/gvisor
 
 
 ## 2. Immutability of Containers at Runtime
+
+### a) Regresando a K3s
+Poner minikube stop y start K3S
+```
+minikube stop
+sudo systemctl start k3s
+
+sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
+export KUBECONFIG=$HOME/.kube/config
+sudo chown $USER:$USER $KUBECONFIG
+kubectl get nodes
+```
+
+### b) Probando cada level
 ```
 cd immutability/
 
@@ -73,8 +87,16 @@ $ mkdir /var/cache/nginx/demo
 $ ls -la /var/cache/nginx/
 $ exit
 
+
 kubectl apply -f 3-immutability.yaml
+$ id
+$ ifconfig
+$ mkdir /demo
+$ mkdir /var/cache/nginx/demo
+$ ls -la /var/cache/nginx/
+$ exit
 ```
+
 
 ## 3. KubeArmor
 
@@ -179,37 +201,124 @@ kubectl exec -ti $(kubectl get pod -l app=nginx -o jsonpath="{.items[0].metadata
 kubectl annotate ns default kubearmor-file-posture=allow --overwrite
 ```
 
+
 ## 4. Mutual TLS
-```
 
+### a) Instalación
+```
 curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install-edge | sh
-
 export PATH=$HOME/.linkerd2/bin:$PATH
+linkerd version
 
-https://linkerd.io/2.15/getting-started/
+linkerd check --pre
 
-Browser: http://localhost:8080/
+linkerd install --crds | kubectl apply -f -
+linkerd install | kubectl apply -f -
 
-https://linkerd.io/2.15/features/automatic-mtls/
-
-https://linkerd.io/2.15/tasks/validating-your-traffic/
-
-
-https://linkerd.io/2.15/tasks/generate-certificates/
-
-
-https://buoyant.io/mtls-guide
-
-
-https://medium.com/@eshiett314/mutual-tls-with-emissary-ingress-and-linkerd-4aa3ffe0413f
+linkerd check
 ```
 
-## 5. Open Policy Agent (OPA)
+### b) App Demo Emojivoto
 ```
-wget https://github.com/open-policy-agent/opa/releases/download/v0.63.0/opa_linux_amd64
-chmod +x opa_linux_amd64
-./opa_linux_amd64 -s
+# Demo app emojivoto
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/emojivoto.yml | kubectl apply -f -
+kubectl -n emojivoto port-forward svc/web-svc 8080:80
 ```
+Navegador http://localhost:8080/
+
+### c) Habilitamos linkerd para el App
+```
+kubectl get -n emojivoto deploy -o yaml \
+  | linkerd inject - \
+  | kubectl apply -f -
+
+# verificar
+linkerd -n emojivoto check --proxy
+```
+
+### d) Explorar Linkerd
+```
+linkerd viz install | kubectl apply -f - 
+linkerd check
+
+linkerd viz dashboard --address 0.0.0.0 &
+```
+Navegador http://localhost:50750/
+
+### e) Validando mTLS con edged y tshark
+```
+linkerd viz -n linkerd edges deployment
+
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/emojivoto.yml \
+  | linkerd inject --enable-debug-sidecar - \
+  | kubectl apply -f -
+
+kubectl -n emojivoto exec -it \
+    $(kubectl -n emojivoto get po -o name | grep voting) \
+    -c linkerd-debug -- /bin/bash
+tshark -i any -d tcp.port==8080,ssl | grep -v 127.0.0.1
+```
+
+Mas info:
+* https://linkerd.io/2.15/tasks/validating-your-traffic/
+* https://linkerd.io/2.15/features/automatic-mtls/
+* https://linkerd.io/2.15/tasks/generate-certificates/
+* https://buoyant.io/mtls-guide
+* https://medium.com/@eshiett314/mutual-tls-with-emissary-ingress-and-linkerd-4aa3ffe0413f
+
+
+## 5. Policy Management with Kyverno
+
+### a) Instalacion
+```
+kubectl create -f https://github.com/kyverno/kyverno/releases/download/v1.11.1/install.yaml
+
+kubectl get all -n kyverno
+
+kubectl label namespace kyverno kyverno=disabled
+kubectl label namespace kube-system kyverno=disabled
+kubectl label namespace default kyverno=enabled
+kubectl get namespace --show-labels
+```
+
+### b) Asegurando que los pods tengan labels
+```
+cd kyverno/
+
+kubectl apply -f enforce-labels.yaml
+kubectl apply -f test-labels.yaml
+
+kubectl get clusterpolicy
+```
+
+### c) Asegurando que no se usen latest
+```
+kubectl apply -f enforce-no-latest.yaml
+kubectl apply -f test-no-latest.yaml
+
+kubectl get clusterpolicy
+```
+
+### d) Asegurando que solo venga de un registry valido
+```
+kubectl apply -f enforce-registry.yaml
+kubectl apply -f test-registry.yaml
+
+kubectl get clusterpolicy
+kubectl get policyreport -o wide
+
+kubectl describe policyreport
+```
+
+### e) Agregando labels por default
+```
+kubectl apply -f enforce-mutation.yaml
+kubectl get clusterpolicy
+
+kubectl run alpine --image alpine
+kubectl get pod alpine --show-labels
+```
+
 
 ## 6. Threat Detection with Falco
 ```
@@ -243,6 +352,7 @@ kubectl exec -it alpine -- sh
 
 kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Notice
 ```
+
 
 ## 7. CIS K8s Benchmark
 ```
