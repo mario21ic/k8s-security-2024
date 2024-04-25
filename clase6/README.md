@@ -200,7 +200,7 @@ $ exit
 
 Opcional: Abriendo port
 ```
-kubectl port-forward $(kubectl get pod -l app=java -o jsonpath="{.items[0].metadata.name}") 8080:8080
+kubectl port-forward $(kubectl get pod -l app=java -o jsonpath="{.items[0].metadata.name}") 8080:8080 --address="0.0.0.0"
 ```
 Navegador http://localhost:8080
 
@@ -248,7 +248,7 @@ linkerd check
 ```
 # Demo app emojivoto
 curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/emojivoto.yml | kubectl apply -f -
-kubectl -n emojivoto port-forward svc/web-svc 8080:80
+kubectl -n emojivoto port-forward svc/web-svc 8080:80 --address="0.0.0.0"
 ```
 Navegador http://localhost:8080/
 
