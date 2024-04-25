@@ -280,6 +280,10 @@ kubectl delete deploy web2
 kubectl delete deploy orgchart
 kubectl delete deploy java-dp
 kubectl delete deploy nginx-dp
+
+kubectl delete pod immutability-pod1
+kubectl delete pod immutability-pod2
+kubectl delete pod immutability-pod3
 ```
 
 ### f) Validando mTLS con edged y tshark
