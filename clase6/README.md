@@ -271,7 +271,18 @@ linkerd viz dashboard --address 0.0.0.0 &
 ```
 Navegador http://localhost:50750/
 
-### e) Validando mTLS con edged y tshark
+### e) Desinstalando anteriores tools
+```
+helm uninstall kubearmor-operator -n kubearmor
+helm uninstall vault
+kubectl delete deploy web
+kubectl delete deploy web2
+kubectl delete deploy orgchart
+kubectl delete deploy java-dp
+kubectl delete deploy nginx-dp
+```
+
+### f) Validando mTLS con edged y tshark
 ```
 linkerd viz -n linkerd edges deployment
 
