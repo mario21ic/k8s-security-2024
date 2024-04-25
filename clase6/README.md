@@ -131,10 +131,11 @@ helm repo update kubearmor
 
 helm upgrade --install kubearmor-operator kubearmor/kubearmor-operator -n kubearmor --create-namespace
 kubectl apply -f https://raw.githubusercontent.com/kubearmor/KubeArmor/main/pkg/KubeArmorOperator/config/samples/sample-config.yml
+helm list -A
 
 # Install CLI
 curl -sfL http://get.kubearmor.io/ | sudo sh -s -- -b /usr/local/bin
-karmor --version
+karmor version
 ```
 
 ### b) Desplegar apps y probar:
